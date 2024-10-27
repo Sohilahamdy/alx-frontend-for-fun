@@ -1,4 +1,27 @@
 #!/usr/bin/python3
+"""
+markdown2html.py: A script to convert a Markdown file to an HTML file.
+
+Usage:
+    ./markdown2html.py <input_markdown_file> <output_html_file>
+
+    - The script takes two arguments:
+        1. The name of the Markdown file to read (input).
+        2. The name of the output HTML file to write to (output).
+
+    - If the number of arguments is less than 2, it prints an error message and exits.
+    - If the Markdown file doesn’t exist, it prints an error message and exits.
+
+Exit codes:
+    - 0: Success
+    - 1: Error (wrong number of arguments or missing file)
+
+Example:
+    ./markdown2html.py README.md README.html
+
+"""
+
+
 import sys
 import os
 
