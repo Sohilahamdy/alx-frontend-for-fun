@@ -117,7 +117,10 @@ if __name__ == "__main__":
                 # Handle paragraph content, including bold and emphasis
                 line = line.replace('**', '<b>', 1).replace('__', '<em>', 1)
                 line = line.replace('**', '</b>', 1).replace('__', '</em>', 1)
-                paragraph_content.append(line)
+                if paragraph_content:
+                    paragraph_content.append(f"<br/>{line}")
+                else:
+                    paragraph_content.append(line)
 
             # Close any remaining paragraph at the end of the file
             if paragraph_content:
