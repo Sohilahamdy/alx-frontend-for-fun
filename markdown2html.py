@@ -13,7 +13,8 @@ Usage:
     it prints an error message and exits.
     - If the Markdown file doesn’t exist,
     it prints an error message and exits.
-    - The script parses headings in Markdown format and converts them to HTML.
+    - The script parses headings, unordered lists, ordered lists, paragraphs,
+      and bold/emphasized text in Markdown format and converts them to HTML.
 
 Markdown Syntax Supported:
     - # Heading level 1 converts to <h1>Heading level 1</h1>
@@ -24,6 +25,9 @@ Markdown Syntax Supported:
     - ###### Heading level 6 converts to <h6>Heading level 6</h6>
     - Unordered lists with '-' convert to <ul><li>...</li></ul>
     - Ordered lists with '*' convert to <ol><li>...</li></ol>
+    - Paragraphs convert to <p>...</p>
+    - Bold text with '**' converts to <b>...</b>
+    - Emphasized text with '__' converts to <em>...</em>
 
 Exit codes:
     - 0: Success
@@ -59,10 +63,21 @@ if __name__ == "__main__":
                 open(output_file, 'w') as outfile:
             in_unordered_list = False
             in_ordered_list = False
+            in_paragraph = False
+            paragraph_content = ""
 
             for line in infile:
                 # Strip leading and trailing spaces/newlines
                 line = line.strip()
+
+                # Handle empty lines for paragraphs
+                if not line:
+                    if in_paragraph:
+                        # Close current paragraph if it exists
+                        outfile.write(f"<p>{paragraph_content}</p>\n")
+                        paragraph_content = ""
+                        in_paragraph = False
+                    continue
 
                 # Check for headings (Markdown syntax)
                 if line.startswith('#'):
@@ -101,19 +116,18 @@ if __name__ == "__main__":
                     outfile.write(f"<li>{list_item}</li>\n")
                     continue
 
-                # Close any open lists if the line is empty or doesn't match
-                if in_unordered_list:
-                    outfile.write("</ul>\n")
-                    in_unordered_list = False
-                if in_ordered_list:
-                    outfile.write("</ol>\n")
-                    in_ordered_list = False
+                # Handle paragraph content, including bold and emphasis
+                line = line.replace('**', '<b>', 1).replace('__', '<em>', 1)
+                line = line.replace('**', '</b>', 1).replace('__', '</em>', 1)
+                paragraph_content += line
 
             # Close any open lists at the end of the file
             if in_unordered_list:
                 outfile.write("</ul>\n")
             if in_ordered_list:
                 outfile.write("</ol>\n")
+            if in_paragraph:
+                outfile.write(f"<p>{paragraph_content}</p>\n")
 
         sys.exit(0)
     except Exception as e:
