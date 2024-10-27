@@ -41,6 +41,16 @@ Example:
 
 import sys
 import os
+import re
+
+
+def convert_line_to_html(line):
+    """Convert a single line of markdown to HTML."""
+    line = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', line)
+    line = re.sub(r'__(.*?)__', r'<em>\1</em>', line)
+
+    return line
+
 
 if __name__ == "__main__":
     # Check the number of arguments
@@ -66,15 +76,14 @@ if __name__ == "__main__":
             paragraph_content = []
 
             for line in infile:
-                # Strip leading and trailing spaces/newlines
                 line = line.strip()
 
                 # Handle empty lines for paragraphs
                 if not line:
                     if paragraph_content:
-                        # Join paragraph content and write it as a <p> element
                         paragraph_text = ' '.join(paragraph_content).strip()
-                        outfile.write(f"<p>{paragraph_text}</p>\n")
+                        paragraph_html = convert_line_to_html(paragraph_text)
+                        outfile.write(f"<p>{paragraph_html}</p>\n")
                         paragraph_content = []
                     if in_unordered_list:
                         outfile.write("</ul>\n")
@@ -102,7 +111,7 @@ if __name__ == "__main__":
                         outfile.write("<ul>\n")
                         in_unordered_list = True
                     list_item = line[2:].strip()
-                    outfile.write(f"<li>{list_item}</li>\n")
+                    outfile.write(f"<li>{html_list_item}</li>\n")
                     continue
 
                 # Check for ordered lists
@@ -111,20 +120,15 @@ if __name__ == "__main__":
                         outfile.write("<ol>\n")
                         in_ordered_list = True
                     list_item = line[2:].strip()
-                    outfile.write(f"<li>{list_item}</li>\n")
+                    outfile.write(f"<li>{html_list_item}</li>\n")
                     continue
 
-                # Handle paragraph content, including bold and emphasis
-                line = line.replace('**', '<b>', 1).replace('__', '<em>', 1)
-                line = line.replace('**', '</b>', 1).replace('__', '</em>', 1)
-                if paragraph_content:
-                    paragraph_content.append(f"<br/>{line}")
-                else:
                     paragraph_content.append(line)
 
             # Close any remaining paragraph at the end of the file
             if paragraph_content:
                 paragraph_text = ' '.join(paragraph_content).strip()
+                paragraph_html = convert_line_to_html(paragraph_text)
                 outfile.write(f"<p>{paragraph_text}</p>\n")
 
             # Close any open lists at the end of the file
