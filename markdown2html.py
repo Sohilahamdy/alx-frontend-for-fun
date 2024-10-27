@@ -9,7 +9,8 @@ Usage:
         1. The name of the Markdown file to read (input).
         2. The name of the output HTML file to write to (output).
 
-    - If the number of arguments is less than 2, it prints an error message and exits.
+    - If the number of arguments is less than 2,
+    it prints an error message and exits.
     - If the Markdown file doesn’t exist, it prints an error message and exits.
 
 Exit codes:
@@ -41,5 +42,28 @@ if __name__ == "__main__":
         print(f"Missing {input_file}", file=sys.stderr)
         sys.exit(1)
 
-    # If everything is okay, the script should exit silently with code 0
-    sys.exit(0)
+    try:
+        with open(input_file, 'r') as infile,
+        open(output_file, 'w') as outfile:
+            for line in infile:
+                # Strip leading and trailing spaces/newlines
+                line = line.strip()
+
+                # Check for headings (Markdown syntax)
+                if line.startswith('#'):
+                    # Count the number of '#' to determine the heading level
+                    heading_level = len(line.split(' ')[0])
+                    if 1 <= heading_level <= 6:
+                        # Extract the heading content after the '#' symbols
+                        heading_content = line[heading_level:].strip()
+                        # Write the corresponding HTML tag to the output file
+                        outfile.write(
+                                f"<h{heading_level}>"
+                                f"{heading_content}"
+                                f"</h{heading_level}>\n"
+                                )
+
+        sys.exit(0)
+    except Exception as e:
+        print(f"Error: {e}", file=sys.stderr)
+        sys.exit(1)
