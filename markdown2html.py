@@ -63,8 +63,7 @@ if __name__ == "__main__":
                 open(output_file, 'w') as outfile:
             in_unordered_list = False
             in_ordered_list = False
-            in_paragraph = False
-            paragraph_content = ""
+            paragraph_content = []
 
             for line in infile:
                 # Strip leading and trailing spaces/newlines
@@ -72,36 +71,36 @@ if __name__ == "__main__":
 
                 # Handle empty lines for paragraphs
                 if not line:
-                    if in_paragraph:
-                        # Close current paragraph if it exists
-                        outfile.write(f"<p>{paragraph_content}</p>\n")
-                        paragraph_content = ""
-                        in_paragraph = False
+                    if paragraph_content:
+                        # Join paragraph content and write it as a <p> element
+                        paragraph_text = ' '.join(paragraph_content).strip()
+                        outfile.write(f"<p>{paragraph_text}</p>\n")
+                        paragraph_content = []
+                    if in_unordered_list:
+                        outfile.write("</ul>\n")
+                        in_unordered_list = False
+                    if in_ordered_list:
+                        outfile.write("</ol>\n")
+                        in_ordered_list = False
                     continue
 
-                # Check for headings (Markdown syntax)
+                # Check for headings
                 if line.startswith('#'):
-                    # Count the number of '#' to determine
-                    # the heading level
                     heading_level = len(line.split(' ')[0])
                     if 1 <= heading_level <= 6:
-                        # Extract the heading content after the '#' symbols
                         heading_content = line[heading_level:].strip()
-                        # Write the corresponding HTML tag
-                        # to the output file
                         outfile.write(
                                 f"<h{heading_level}>"
                                 f"{heading_content}"
                                 f"</h{heading_level}>\n"
                                 )
-                    continue  # Skip to the next line
+                    continue
 
                 # Check for unordered lists
                 if line.startswith('- '):
                     if not in_unordered_list:
                         outfile.write("<ul>\n")
                         in_unordered_list = True
-                    # Extract the list item content
                     list_item = line[2:].strip()
                     outfile.write(f"<li>{list_item}</li>\n")
                     continue
@@ -111,7 +110,6 @@ if __name__ == "__main__":
                     if not in_ordered_list:
                         outfile.write("<ol>\n")
                         in_ordered_list = True
-                    # Extract the list item content
                     list_item = line[2:].strip()
                     outfile.write(f"<li>{list_item}</li>\n")
                     continue
@@ -119,15 +117,18 @@ if __name__ == "__main__":
                 # Handle paragraph content, including bold and emphasis
                 line = line.replace('**', '<b>', 1).replace('__', '<em>', 1)
                 line = line.replace('**', '</b>', 1).replace('__', '</em>', 1)
-                paragraph_content += line
+                paragraph_content.append(line)
+
+            # Close any remaining paragraph at the end of the file
+            if paragraph_content:
+                paragraph_text = ' '.join(paragraph_content).strip()
+                outfile.write(f"<p>{paragraph_text}</p>\n")
 
             # Close any open lists at the end of the file
             if in_unordered_list:
                 outfile.write("</ul>\n")
             if in_ordered_list:
                 outfile.write("</ol>\n")
-            if in_paragraph:
-                outfile.write(f"<p>{paragraph_content}</p>\n")
 
         sys.exit(0)
     except Exception as e:
