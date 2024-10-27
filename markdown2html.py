@@ -43,25 +43,27 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        with open(input_file, 'r') as infile,
-        open(output_file, 'w') as outfile:
-            for line in infile:
-                # Strip leading and trailing spaces/newlines
-                line = line.strip()
+        with open(input_file, 'r') as infile:
+            open(output_file, 'w') as outfile:
+                for line in infile:
+                    # Strip leading and trailing spaces/newlines
+                    line = line.strip()
 
-                # Check for headings (Markdown syntax)
-                if line.startswith('#'):
-                    # Count the number of '#' to determine the heading level
-                    heading_level = len(line.split(' ')[0])
-                    if 1 <= heading_level <= 6:
-                        # Extract the heading content after the '#' symbols
-                        heading_content = line[heading_level:].strip()
-                        # Write the corresponding HTML tag to the output file
-                        outfile.write(
-                                f"<h{heading_level}>"
-                                f"{heading_content}"
-                                f"</h{heading_level}>\n"
-                                )
+                    # Check for headings (Markdown syntax)
+                    if line.startswith('#'):
+                        # Count the number of '#' to determine
+                        # the heading level
+                        heading_level = len(line.split(' ')[0])
+                        if 1 <= heading_level <= 6:
+                            # Extract the heading content after the '#' symbols
+                            heading_content = line[heading_level:].strip()
+                            # Write the corresponding HTML tag
+                            # to the output file
+                            outfile.write(
+                                    f"<h{heading_level}>"
+                                    f"{heading_content}"
+                                    f"</h{heading_level}>\n"
+                                    )
 
         sys.exit(0)
     except Exception as e:
