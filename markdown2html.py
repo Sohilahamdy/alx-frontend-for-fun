@@ -111,6 +111,7 @@ if __name__ == "__main__":
                         outfile.write("<ul>\n")
                         in_unordered_list = True
                     list_item = line[2:].strip()
+                    html_list_item = convert_line_to_html(list_item)
                     outfile.write(f"<li>{html_list_item}</li>\n")
                     continue
 
@@ -120,6 +121,7 @@ if __name__ == "__main__":
                         outfile.write("<ol>\n")
                         in_ordered_list = True
                     list_item = line[2:].strip()
+                    html_list_item = convert_line_to_html(list_item)
                     outfile.write(f"<li>{html_list_item}</li>\n")
                     continue
 
