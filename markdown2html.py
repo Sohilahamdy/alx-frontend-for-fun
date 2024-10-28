@@ -40,13 +40,18 @@ Example:
 import sys
 import os
 import re
+import hashlib
 
 def convert_line_to_html(line):
     """Convert a single line of markdown to HTML."""
-    # Match bold text between ** and capture everything inside
     line = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', line)
-    # Match emphasized text between __ and capture everything inside
     line = re.sub(r'__(.+?)__', r'<em>\1</em>', line)
+    line = re.sub(r'\[\[(.+?)\]\]',
+                  lambda m: hashlib.md5(m.group(1).encode()).hexdigest(),
+                  line)
+    line = re.sub(r'\(\((.+?)\)\)',
+                  lambda m: m.group(1).replace('c', '').replace('C', ''),
+                  line)
 
     return line
 
@@ -68,22 +73,20 @@ if __name__ == "__main__":
 
     try:
         with open(input_file, 'r') as infile, \
-        open(output_file, 'w') as outfile:
+                open(output_file, 'w') as outfile:
             in_unordered_list = False
             in_ordered_list = False
             paragraph_content = []
 
             for line in infile:
-                # Strip leading and trailing spaces/newlines
                 line = line.strip()
 
                 # Handle empty lines for paragraphs
                 if not line:
                     if paragraph_content:
-                        # Join paragraph content and write it as a <p> element
                         paragraph_text = ' '.join(paragraph_content).strip()
                         outfile.write(f"<p>{paragraph_text}</p>\n")
-                        paragraph_content = []  # Reset for next paragraph
+                        paragraph_content = []
                     if in_unordered_list:
                         outfile.write("</ul>\n")
                         in_unordered_list = False
@@ -98,7 +101,7 @@ if __name__ == "__main__":
                     if 1 <= heading_level <= 6:
                         heading_content = line[heading_level:].strip()
                         outfile.write(f"<h{heading_level}>{heading_content}</h{heading_level}>\n")
-                    continue  # Skip to the next line
+                    continue
 
                 # Handle unordered lists
                 if line.startswith('- '):
@@ -124,10 +127,9 @@ if __name__ == "__main__":
                 line = line.replace('**', '<b>', 1).replace('__', '<em>', 1)
                 line = line.replace('**', '</b>', 1).replace('__', '</em>', 1)
                 if paragraph_content:
-                    # If there is already paragraph content, we append a line break
                     paragraph_content.append(f"<br/>{line}")
                 else:
-                    paragraph_content.append(line)  # Add line to paragraph content
+                    paragraph_content.append(line)
 
             # Close any remaining paragraph at the end of the file
             if paragraph_content:
