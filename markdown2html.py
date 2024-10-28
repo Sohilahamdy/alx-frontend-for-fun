@@ -125,14 +125,6 @@ if __name__ == "__main__":
                     outfile.write(f"<li>{list_item_html}</li>\n")
                     continue
 
-                if line.endwith('__ '):
-                    if not in_ordered_list:
-                        outfile.write("<br/>\n")
-                        in_ordered_list = True                                              list_item = line[2:].strip()
-                    list_item_html = convert_line_to_html(list_item)
-                    outfile.write(f"<li>{list_item_html}</li>\n")
-                    continue
-
                 # Append to paragraph content
                 paragraph_content.append(line)
 
@@ -140,7 +132,11 @@ if __name__ == "__main__":
             if paragraph_content:
                 paragraph_text = ' '.join(paragraph_content).strip()
                 paragraph_html = convert_line_to_html(paragraph_text)
-                outfile.write(f"<p>{paragraph_html}</p>\n")
+                outfile.write(
+                        "<p>\n" +
+                        paragraph_html.replace('\n', '<br/>') +
+                        "</p>\n"
+                )
 
             # Close any open lists at the end of the file
             if in_unordered_list:
