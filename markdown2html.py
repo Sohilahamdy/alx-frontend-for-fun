@@ -39,6 +39,17 @@ Example:
 
 import sys
 import os
+import re
+
+def convert_line_to_html(line):
+    """Convert a single line of markdown to HTML."""
+    # Match bold text between ** and capture everything inside
+    line = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', line)
+    # Match emphasized text between __ and capture everything inside
+    line = re.sub(r'__(.+?)__', r'<em>\1</em>', line)
+
+    return line
+
 
 if __name__ == "__main__":
     # Check the number of arguments
@@ -56,7 +67,8 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
+        with open(input_file, 'r') as infile, \
+        open(output_file, 'w') as outfile:
             in_unordered_list = False
             in_ordered_list = False
             paragraph_content = []
@@ -83,8 +95,9 @@ if __name__ == "__main__":
                 # Check for headings
                 if line.startswith('#'):
                     heading_level = len(line.split(' ')[0])
-                    heading_content = line[heading_level:].strip()
-                    outfile.write(f"<h{heading_level}>{heading_content}</h{heading_level}>\n")
+                    if 1 <= heading_level <= 6:
+                        heading_content = line[heading_level:].strip()
+                        outfile.write(f"<h{heading_level}>{heading_content}</h{heading_level}>\n")
                     continue  # Skip to the next line
 
                 # Handle unordered lists
@@ -93,7 +106,8 @@ if __name__ == "__main__":
                         outfile.write("<ul>\n")
                         in_unordered_list = True
                     list_item = line[2:].strip()
-                    outfile.write(f"<li>{list_item}</li>\n")
+                    list_item_html = convert_line_to_html(list_item)
+                    outfile.write(f"<li>{list_item_html}</li>\n")
                     continue
 
                 # Handle ordered lists
@@ -102,7 +116,8 @@ if __name__ == "__main__":
                         outfile.write("<ol>\n")
                         in_ordered_list = True
                     list_item = line[2:].strip()
-                    outfile.write(f"<li>{list_item}</li>\n")
+                    list_item_html = convert_line_to_html(list_item)
+                    outfile.write(f"<li>{list_item_html}</li>\n")
                     continue
 
                 # Handle paragraph content (including bold and emphasis)
