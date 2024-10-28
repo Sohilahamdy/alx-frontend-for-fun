@@ -36,7 +36,6 @@ Exit codes:
 
 Example:
     ./markdown2html.py README.md README.html
-
 """
 
 import sys
@@ -46,7 +45,7 @@ import re
 
 def convert_line_to_html(line):
     """Convert a single line of markdown to HTML."""
-    # Correctly match bold text between ** and capture everything inside
+    # Match bold text between ** and capture everything inside
     line = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', line)
     # Match emphasized text between __ and capture everything inside
     line = re.sub(r'__(.+?)__', r'<em>\1</em>', line)
@@ -102,9 +101,8 @@ if __name__ == "__main__":
                         heading_content = line[heading_level:].strip()
                         outfile.write(
                             f"<h{heading_level}>"
-                            f"{heading_content}"
-                            f"</h{heading_level}>\n"
-                            )
+                            f"{heading_content}</h{heading_level}>\n"
+                        )
                     continue
 
                 # Check for unordered lists
@@ -135,7 +133,7 @@ if __name__ == "__main__":
                 paragraph_text = ' '.join(paragraph_content).strip()
                 paragraph_html = convert_line_to_html(paragraph_text)
                 # Before writing to the output file,
-                #replace newlines and construct the paragraph HTML
+                # replace newlines and construct the paragraph HTML
                 paragraph_html = paragraph_html.replace('\n', '<br/>')
                 outfile.write(f"<p>{paragraph_html}</p>\n")
 
