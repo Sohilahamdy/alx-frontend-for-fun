@@ -13,8 +13,9 @@ Usage:
     it prints an error message and exits.
     - If the Markdown file doesn’t exist,
     it prints an error message and exits.
-    - The script parses headings, unordered lists, ordered lists, paragraphs,
-      and bold/emphasized text in Markdown format and converts them to HTML.
+    - The script parses headings, unordered lists, ordered lists,
+      paragraphs, and bold/emphasized text in Markdown format
+      and converts them to HTML.
 
 Markdown Syntax Supported:
     - # Heading level 1 converts to <h1>Heading level 1</h1>
@@ -38,7 +39,6 @@ Example:
 
 """
 
-
 import sys
 import os
 import re
@@ -46,8 +46,10 @@ import re
 
 def convert_line_to_html(line):
     """Convert a single line of markdown to HTML."""
-    line = re.sub(r'\*\*(.*?)\*\*', r'<b>\1</b>', line)
-    line = re.sub(r'__(.*?)__', r'<em>\1</em>', line)
+    # Correctly match bold text between ** and capture everything inside
+    line = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', line)
+    # Match emphasized text between __ and capture everything inside
+    line = re.sub(r'__(.+?)__', r'<em>\1</em>', line)
 
     return line
 
@@ -55,8 +57,7 @@ def convert_line_to_html(line):
 if __name__ == "__main__":
     # Check the number of arguments
     if len(sys.argv) < 3:
-        print("Usage: ./markdown2html.py README.md README.html",
-              file=sys.stderr)
+        print("Usage: ./markdown2html.py README.md README.html", file=sys.stderr)
         sys.exit(1)
 
     # Get the input and output file names
@@ -69,8 +70,7 @@ if __name__ == "__main__":
         sys.exit(1)
 
     try:
-        with open(input_file, 'r') as infile, \
-                open(output_file, 'w') as outfile:
+        with open(input_file, 'r') as infile, open(output_file, 'w') as outfile:
             in_unordered_list = False
             in_ordered_list = False
             paragraph_content = []
@@ -99,10 +99,8 @@ if __name__ == "__main__":
                     if 1 <= heading_level <= 6:
                         heading_content = line[heading_level:].strip()
                         outfile.write(
-                                f"<h{heading_level}>"
-                                f"{heading_content}"
-                                f"</h{heading_level}>\n"
-                                )
+                            f"<h{heading_level}>{heading_content}</h{heading_level}>\n"
+                        )
                     continue
 
                 # Check for unordered lists
@@ -125,14 +123,14 @@ if __name__ == "__main__":
                     outfile.write(f"<li>{list_item_html}</li>\n")
                     continue
 
-                    # If no special syntax is detected
-                    paragraph_content.append(line)
+                # Append to paragraph content
+                paragraph_content.append(line)
 
             # Close any remaining paragraph at the end of the file
             if paragraph_content:
                 paragraph_text = ' '.join(paragraph_content).strip()
                 paragraph_html = convert_line_to_html(paragraph_text)
-                outfile.write(f"<p>{paragraph_text}</p>\n")
+                outfile.write(f"<p>{paragraph_html}</p>\n")
 
             # Close any open lists at the end of the file
             if in_unordered_list:
