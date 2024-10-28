@@ -42,6 +42,7 @@ import os
 import re
 import hashlib
 
+
 def convert_line_to_html(line):
     """Convert a single line of markdown to HTML."""
     line = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', line)
@@ -59,7 +60,8 @@ def convert_line_to_html(line):
 if __name__ == "__main__":
     # Check the number of arguments
     if len(sys.argv) < 3:
-        print("Usage: ./markdown2html.py README.md README.html", file=sys.stderr)
+        print("Usage: ./markdown2html.py README.md README.html",
+              file=sys.stderr)
         sys.exit(1)
 
     # Get the input and output file names
@@ -100,7 +102,10 @@ if __name__ == "__main__":
                     heading_level = len(line.split(' ')[0])
                     if 1 <= heading_level <= 6:
                         heading_content = line[heading_level:].strip()
-                        outfile.write(f"<h{heading_level}>{heading_content}</h{heading_level}>\n")
+                        outfile.write(
+                            f"<h{heading_level}>"
+                            f"{heading_content}</h{heading_level}>\n"
+                        )
                     continue
 
                 # Handle unordered lists
@@ -129,7 +134,7 @@ if __name__ == "__main__":
                 if paragraph_content:
                     paragraph_content.append(f"<br/>{line}")
                 else:
-                    paragraph_content.append(line)
+                    paragraph_content.append(convert_line_to_html(line))
 
             # Close any remaining paragraph at the end of the file
             if paragraph_content:
