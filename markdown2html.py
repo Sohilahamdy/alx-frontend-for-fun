@@ -133,10 +133,10 @@ if __name__ == "__main__":
                 paragraph_text = ' '.join(paragraph_content).strip()
                 paragraph_html = convert_line_to_html(paragraph_text)
                 outfile.write(
-                        "<p>\n" +
-                        paragraph_html.replace('\n', '<br/>') +
-                        "</p>\n"
-                        )
+                    "<p>\n" + 
+                    paragraph_html.replace('\n', '<br/>') + 
+                    "</p>\n"
+                )
 
             # Close any open lists at the end of the file
             if in_unordered_list:
